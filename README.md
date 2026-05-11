@@ -27,7 +27,7 @@
 ## 5. 권한 및 SetGID 설정
 ![alt text](./image/image-14.png)
 ## 6. 계정 그룹 확인
-![alt text](./image/mage-15.png)
+![alt text](./image/image-15.png)
 ## 7. ls -l 로 소유/권한 확인
 ![alt text](./image/image-16.png)
 ## 8. getfacl로 소유/권한 확인
