@@ -41,6 +41,8 @@
 ![alt text](./image/image-20.png)
 ## 4. 앱 실행 및 종료
 ![alt text](./image/image-21.png)
+## 5. 앱을 백그라운드로 실행후 0.0.0.0:15034로 LISTEN 상태임을 확인
+![alt text](./image/image-29.png)
 # 4. 시스템 관제 자동화 스크립트 (monitor.sh) 구현
 ## 1. monitor.sh 구현
 ![alt text](./image/image-22.png)
