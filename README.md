@@ -42,7 +42,7 @@
 ## 4. 앱 실행 및 종료
 ![alt text](./image/image-21.png)
 # 4. 시스템 관제 자동화 스크립트 (monitor.sh) 구현
-## 1. monitor.sh 구현 및 log 폴더 생성
+## 1. monitor.sh 구현
 ![alt text](./image/image-22.png)
 ![alt text](./image/image-23.png)
 ![alt text](./image/image-24.png)
