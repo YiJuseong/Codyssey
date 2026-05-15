@@ -3,7 +3,7 @@
 # ---------------------------------------------------------
 # 환경 설정
 # ---------------------------------------------------------
-APP_NAME="agent_app.py"
+APP_NAME="agent-apppy"
 CHECK_PORT=15034
 LOG_FILE="/var/log/agent-app/monitor.log"
 CPU_LIMIT=20
