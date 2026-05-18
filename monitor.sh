@@ -16,7 +16,7 @@ echo "====== SYSTEM MONITOR RESULT ======"
 # 1. Health Check (실패 시 종료)
 # ---------------------------------------------------------
 echo "[HEALTH CHECK]"
-PID=$(pgrep -f "$APP_NAME")
+PID=$(pgrep -f "$APP_NAME" | head -n 1)
 if [ -z "$PID" ]; then
     echo "Checking process '$APP_NAME'... [FAILED]"
     exit 1
@@ -61,18 +61,18 @@ APP_DISK_USED=$(du -sm "$APP_DIR" | awk '{print $1}') # MB 단위 수치만 추�
 echo "App Disk Used : ${APP_DISK_USED}MB"
 
 # 임계값 경고 출력
-# CPU 점검
-if (( $(echo "$APP_CPU > $CPU_LIMIT" | bc -l) )); then
+CPU_WARN=$(awk -v cpu="$APP_CPU" -v limit="$CPU_LIMIT" 'BEGIN {print (cpu > limit) ? 1 : 0}')
+if [ "$CPU_WARN" -eq 1 ]; then
     echo "[WARNING] App CPU threshold exceeded ($APP_CPU% > $CPU_LIMIT%)"
 fi
 
 # MEM 점검
-if (( $(echo "$APP_MEM > $MEM_LIMIT" | bc -l) )); then
+MEM_WARN=$(awk -v mem="$APP_MEM" -v limit="$MEM_LIMIT" 'BEGIN {print (mem > limit) ? 1 : 0}')
+if [ "$MEM_WARN" -eq 1 ]; then
     echo "[WARNING] App MEM threshold exceeded ($APP_MEM% > $MEM_LIMIT%)"
 fi
 
-# DISK 점검 (앱 용량이 설정한 MB 제한을 넘었는지 확인)
-# 주의: 기존 DISK_LIMIT=80이 퍼센트(%) 기준이었다면, 앱 기준으로는 '적정 MB 용량'(예: 1024)으로 상단 환경설정에서 변경하는 것이 좋습니다.
+# DISK 점검
 if [ "$APP_DISK_USED" -gt "$DISK_LIMIT" ]; then
     echo "[WARNING] App DISK threshold exceeded (${APP_DISK_USED}MB > ${DISK_LIMIT}MB)"
 fi
