@@ -49,10 +49,10 @@
 ![alt text](./image/image-23.png)
 
 ## 2. monitor.sh 실행이 되는지 확인
-![alt text](./image/image-25.png)
+![alt text](./image/image-30.png)
 ## 3. 권한 및 파일 정책 설정
 ![alt text](./image/image-26.png)
 ## 4. cron 설정
 ![alt text](./image/image-27.png)
 ## 5. 1분마다 로그가 기록되는지 확인
-![alt text](./image/image-28.png)
+![alt text](./image/image-31.png)
