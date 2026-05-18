@@ -47,7 +47,7 @@
 ## 1. monitor.sh 구현
 ![alt text](./image/image-22.png)
 ![alt text](./image/image-23.png)
-![alt text](./image/image-24.png)
+
 ## 2. monitor.sh 실행이 되는지 확인
 ![alt text](./image/image-25.png)
 ## 3. 권한 및 파일 정책 설정
