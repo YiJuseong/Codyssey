@@ -3,7 +3,7 @@
 # ---------------------------------------------------------
 # 환경 설정
 # ---------------------------------------------------------
-APP_NAME="agent-apppy"
+APP_NAME="agent-app"
 CHECK_PORT=15034
 LOG_FILE="/var/log/agent-app/monitor.log"
 CPU_LIMIT=20
@@ -41,36 +41,47 @@ fi
 # ---------------------------------------------------------
 # 3. 자원 수집 및 임계값 점검
 # ---------------------------------------------------------
-echo -e "\n[RESOURCE MONITORING]"
+echo -e "\n[RESOURCE MONITORING - $APP_NAME (PID: $PID)]"
 
-# CPU Usage (1초간 측정 평균)
-CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')
-echo "CPU Usage : $CPU_USAGE%"
+# 3-1. 앱의 CPU 및 MEM 사용량 수집 (ps 명령어로 PID 기준 추출)
+# ps -p PID -o %cpu,%mem 구조를 활용하며, tail -1로 수치만 가져옵니다.
+APP_RESOURCES=$(ps -p "$PID" -o %cpu,%mem | tail -1)
+APP_CPU=$(echo "$APP_RESOURCES" | awk '{print $1}')
+APP_MEM=$(echo "$APP_RESOURCES" | awk '{print $2}')
 
-# MEM Usage
-MEM_USAGE=$(free | grep Mem | awk '{print $3/$2 * 100.0}' | xargs printf "%.1f")
-echo "MEM Usage : $MEM_USAGE%"
+echo "App CPU Usage : $APP_CPU%"
+echo "App MEM Usage : $APP_MEM%"
 
-# DISK Usage (Root partition)
-DISK_USED=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
-echo "DISK Used : $DISK_USED%"
+# 3-2. 앱의 DISK 사용량 수집 (앱이 설치된 디렉토리 또는 로그 디렉토리 크기)
+# 프로세스 자체의 '실시간 디스크 사용량(I/O)' 보다는, 앱 폴더가 차지하는 용량을 측정하는 것이 일반적입니다.
+# 여기서는 예시로 로그 파일($LOG_FILE)이 속한 디렉토리나 앱 디렉토리 용량을 확인합니다.
+APP_DIR=$(dirname "$LOG_FILE") 
+APP_DISK_USED=$(du -sm "$APP_DIR" | awk '{print $1}') # MB 단위 수치만 추출
+
+echo "App Disk Used : ${APP_DISK_USED}MB"
 
 # 임계값 경고 출력
-if (( $(echo "$CPU_USAGE > $CPU_LIMIT" | bc -l) )); then
-    echo "[WARNING] CPU threshold exceeded ($CPU_USAGE% > $CPU_LIMIT%)"
+# CPU 점검
+if (( $(echo "$APP_CPU > $CPU_LIMIT" | bc -l) )); then
+    echo "[WARNING] App CPU threshold exceeded ($APP_CPU% > $CPU_LIMIT%)"
 fi
-if (( $(echo "$MEM_USAGE > $MEM_LIMIT" | bc -l) )); then
-    echo "[WARNING] MEM threshold exceeded ($MEM_USAGE% > $MEM_LIMIT%)"
+
+# MEM 점검
+if (( $(echo "$APP_MEM > $MEM_LIMIT" | bc -l) )); then
+    echo "[WARNING] App MEM threshold exceeded ($APP_MEM% > $MEM_LIMIT%)"
 fi
-if [ "$DISK_USED" -gt "$DISK_LIMIT" ]; then
-    echo "[WARNING] DISK threshold exceeded ($DISK_USED% > $DISK_LIMIT%)"
+
+# DISK 점검 (앱 용량이 설정한 MB 제한을 넘었는지 확인)
+# 주의: 기존 DISK_LIMIT=80이 퍼센트(%) 기준이었다면, 앱 기준으로는 '적정 MB 용량'(예: 1024)으로 상단 환경설정에서 변경하는 것이 좋습니다.
+if [ "$APP_DISK_USED" -gt "$DISK_LIMIT" ]; then
+    echo "[WARNING] App DISK threshold exceeded (${APP_DISK_USED}MB > ${DISK_LIMIT}MB)"
 fi
 
 # ---------------------------------------------------------
 # 4. 로그 기록
 # ---------------------------------------------------------
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
-LOG_LINE="[$TIMESTAMP] PID:$PID CPU:$CPU_USAGE% MEM:$MEM_USAGE% DISK_USED:$DISK_USED%"
+LOG_LINE="[$TIMESTAMP] PID:$PID CPU:$APP_CPU% MEM:$APP_MEM% DISK_USED:$APP_DISK_USED%"
 
 # 로그 디렉토리 권한 체크 및 기록
 echo "$LOG_LINE" >> "$LOG_FILE"
