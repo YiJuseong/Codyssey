@@ -43,22 +43,26 @@ fi
 # ---------------------------------------------------------
 echo -e "\n[RESOURCE MONITORING - $APP_NAME (PID: $PID)]"
 
-# 3-1. 앱의 CPU 및 MEM 사용량 수집 (ps 명령어로 PID 기준 추출)
-# ps -p PID -o %cpu,%mem 구조를 활용하며, tail -1로 수치만 가져옵니다.
-APP_RESOURCES=$(ps -p "$PID" -o %cpu,%mem | tail -1)
-APP_CPU=$(echo "$APP_RESOURCES" | awk '{print $1}')
-APP_MEM=$(echo "$APP_RESOURCES" | awk '{print $2}')
+# 3-1. 앱의 실시간 CPU 및 MEM 사용량 수집 (top 명령어 활용)
+# -b: 배치 모드(텍스트 출력), -n 2: 2회 측정 (첫 번째는 누적치이므로 두 번째 수치를 사용해야 실시간이 됩니다)
+# -d 0.5: 측정 간격 0.5초, -p: 특정 PID 지정
+TOP_OUTPUT=$(top -b -n 2 -d 0.5 -p "$PID" 2>/dev/null)
 
-echo "App CPU Usage : $APP_CPU%"
+# 두 번째 측정 결과에서 해당 PID가 있는 라인을 찾아 CPU와 MEM 추출
+APP_RESOURCES=$(echo "$TOP_OUTPUT" | grep -A 100 "PID" | grep -v "PID" | tail -n 1)
+
+APP_CPU=$(echo "$APP_RESOURCES" | awk '{print $9}')
+APP_MEM=$(echo "$APP_RESOURCES" | awk '{print $10}')
+
+echo "App Real-time CPU Usage : $APP_CPU%"
 echo "App MEM Usage : $APP_MEM%"
 
-# 3-2. 앱의 DISK 사용량 수집 (앱이 설치된 디렉토리 또는 로그 디렉토리 크기)
-# 프로세스 자체의 '실시간 디스크 사용량(I/O)' 보다는, 앱 폴더가 차지하는 용량을 측정하는 것이 일반적입니다.
-# 여기서는 예시로 로그 파일($LOG_FILE)이 속한 디렉토리나 앱 디렉토리 용량을 확인합니다.
+#3-2. 앱의 DISK 사용량 및 디스크 자체의 사용 백분율 점검
 APP_DIR=$(dirname "$LOG_FILE") 
-APP_DISK_USED=$(du -sm "$APP_DIR" | awk '{print $1}') # MB 단위 수치만 추출
+# df 명령어를 통해 해당 폴더가 속한 디스크의 실제 사용률(%)을 추출합니다.
+APP_DISK_USED=$(df -P "$APP_DIR" | tail -1 | awk '{print $5}' | tr -d '%')
 
-echo "App Disk Used : ${APP_DISK_USED}MB"
+echo "Disk Usage : ${APP_DISK_USED}%"
 
 # 임계값 경고 출력
 CPU_WARN=$(awk -v cpu="$APP_CPU" -v limit="$CPU_LIMIT" 'BEGIN {print (cpu > limit) ? 1 : 0}')
@@ -74,7 +78,7 @@ fi
 
 # DISK 점검
 if [ "$APP_DISK_USED" -gt "$DISK_LIMIT" ]; then
-    echo "[WARNING] App DISK threshold exceeded (${APP_DISK_USED}MB > ${DISK_LIMIT}MB)"
+    echo "[WARNING] App DISK threshold exceeded (${APP_DISK_USED}% > ${DISK_LIMIT}%)"
 fi
 
 # ---------------------------------------------------------
