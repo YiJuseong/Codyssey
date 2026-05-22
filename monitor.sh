@@ -42,6 +42,15 @@ fi
 # 3. 자원 수집 및 임계값 점검
 # ---------------------------------------------------------
 echo -e "\n[RESOURCE MONITORING - $APP_NAME (PID: $PID)]"
+# top 명령어 대신 ps 명령어를 사용하여 RSS(kb 단위 실제 메모리)를 가져옵니다.
+# 또는 컨테이너 내부라면 cat /sys/fs/cgroup/memory.current 활용 가능
+APP_RSS_KB=$(ps -p "$PID" -o rss= | tr -d ' ')
+if [ -z "$APP_RSS_KB" ]; then
+    APP_RSS_KB=0
+fi
+
+# KB 단위를 MB 단위로 환산 (소수점 포함)
+APP_MEM_MB=$(awk -v kb="$APP_RSS_KB" 'BEGIN {printf "%.2f", kb / 1024}')
 
 # 3-1. 앱의 실시간 CPU 및 MEM 사용량 수집 (top 명령어 활용)
 # -b: 배치 모드(텍스트 출력), -n 2: 2회 측정 (첫 번째는 누적치이므로 두 번째 수치를 사용해야 실시간이 됩니다)
@@ -55,7 +64,8 @@ APP_CPU=$(echo "$APP_RESOURCES" | awk '{print $9}')
 APP_MEM=$(echo "$APP_RESOURCES" | awk '{print $10}')
 
 echo "App Real-time CPU Usage : $APP_CPU%"
-echo "App MEM Usage : $APP_MEM%"
+echo "App MEM Usage % : $APP_MEM%"
+echo "App MEM Usage MB : ${APP_MEM_MB} MB"
 
 #3-2. 앱의 DISK 사용량 및 디스크 자체의 사용 백분율 점검
 APP_DIR=$(dirname "$LOG_FILE") 
