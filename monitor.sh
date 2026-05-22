@@ -95,7 +95,7 @@ fi
 # 4. 로그 기록
 # ---------------------------------------------------------
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
-LOG_LINE="[$TIMESTAMP] PID:$PID CPU:$APP_CPU% MEM:$APP_MEM% DISK_USED:$APP_DISK_USED%"
+LOG_LINE="[$TIMESTAMP] PID:$PID CPU:$APP_CPU% MEM%:$APP_MEM% MEM MB:$APP_MEM_MB MB DISK_USED:$APP_DISK_USED%"
 
 # 로그 디렉토리 권한 체크 및 기록
 echo "$LOG_LINE" >> "$LOG_FILE"
