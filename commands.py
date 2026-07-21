@@ -61,17 +61,25 @@ class GitCommandHandler:
         current_head = self.repo.branches.get(self.repo.head_branch)
         if not current_head:
             return "No commits found in the current branch.", False
-            
-        topo_ordered = get_topological_sort(self.repo.commits, current_head)
-        
-        if sort_option == "date":
-            topo_ordered = merge_sort(topo_ordered, lambda a, b: a.timestamp < b.timestamp)
-        elif sort_option == "author":
-            topo_ordered = merge_sort(topo_ordered, lambda a, b: a.author < b.author)
-        elif sort_option is not None:
+
+        # 1. 옵션 검증
+        if sort_option not in (None, "date", "author"):
             return "Invalid args (Valid sort types: date, author)", False
-            
-        return topo_ordered, True
+
+        # 2. 옵션별 분기 처리 (불필요한 위상 정렬 연산 방지)
+        if sort_option is None:
+            # 정렬 옵션이 없으면 부모-자식 위상 정렬
+            result = get_topological_sort(self.repo.commits, current_head)
+        elif sort_option == "date":
+            # 전체 커밋 대상 날짜순 정렬
+            commits_list = list(self.repo.commits.values())
+            result = merge_sort(commits_list, lambda a, b: a.timestamp < b.timestamp)
+        elif sort_option == "author":
+            # 전체 커밋 대상 작성자순 정렬
+            commits_list = list(self.repo.commits.values())
+            result = merge_sort(commits_list, lambda a, b: a.author < b.author)
+
+        return result, True
 
     def path(self, c1, c2):
         if c1 not in self.repo.commits or c2 not in self.repo.commits:
