@@ -115,3 +115,9 @@ class GitCommandHandler:
         matched_commits = [self.repo.commits[h] for h in result_hashes]
         sorted_matches = merge_sort(matched_commits, lambda a, b: a.hash < b.hash)
         return sorted_matches, True
+    
+    def get_current_branch(self):
+        """현재 활성화된 브랜치명을 동적으로 반환 (초기화 전이면 NO-REPO 반환)"""
+        if not self.repo.is_initialized or not self.repo.head_branch:
+            return "NO-REPO"
+        return self.repo.head_branch

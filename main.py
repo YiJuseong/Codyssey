@@ -18,7 +18,8 @@ def main():
     
     while True:
         try:
-            raw_input = input("mini-git> ").strip()
+            current_branch = handler.get_current_branch()
+            raw_input = input(f"[{current_branch}] > ").strip()
         except (KeyboardInterrupt, EOFError):
             print("\nGoodbye.")
             break
