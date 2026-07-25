@@ -74,8 +74,7 @@ Switched to branch 'feature-a'.
 
 * **INIT 명령 필수화**: 시스템 시작 시 저장소 상태는 비활성화(`is_initialized = False`)되어 있으며, `INIT` 명령어를 실행하기 전에 타 명령어 호출 시 `"Run 'INIT' first"` 안내 후 동작을 차단합니다.
 * **기본 브랜치 고정 (`main`)**: 초기화 시 기본 브랜치는 `main`으로 지정되며, Modern Git 컨벤션을 준수합니다.
-* **HEAD 포인터 불변식 (Invariants)**:
-  $$\text{head\_branch} \in \text{Keys}(\text{branches}) \quad \land \quad \text{branches}[\text{head\_branch}] \in \text{commits}$$
+
   `head_branch` 포인터는 커밋 해시를 직접 가리키지 않고 **항상 브랜치를 경유**합니다.
 
 ---
