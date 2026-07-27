@@ -45,23 +45,23 @@ python main.py
 ```bash
 # 1. 저장소 초기화 (필수)
 [NO-REPO] > INIT Alice
-Initialized empty Mini Git repository for user 'Alice' in branch 'main'.
+Initialized empty Mini Git repository for user 'Alice'
 
 # 2. 커밋 생성
 [main] > COMMIT "Initial commit"
-[main c1] Initial commit
+[c1] Committed successfully: "Initial commit"
 
 # 3. 브랜치 생성 및 전환
 [main] > BRANCH feature-a
-Branch 'feature-a' created at c1.
-[main] > CHECKOUT feature-a
-Switched to branch 'feature-a'.
+Branch 'feature-a' created.
+[main] > SWITCH feature-a
+Switched to branch 'feature-a'
 
 # 4. 신규 브랜치에서 작업 및 검색
 [feature-a] > COMMIT "Fix bug in search engine" --author="Bob"
-[feature-a c2] Fix bug in search engine
+[c2] Committed successfully: "Fix bug in search engine"
 [feature-a] > SEARCH bug
-[c2] Fix bug in search engine (Author: Bob, Parents: c1)
+[c2] Alice | 2026-07-27 15:21:03 | Fix bug in search engine
 ```
 
 ---
@@ -121,6 +121,22 @@ Switched to branch 'feature-a'.
 
 * **토큰화 파싱**: `r'(?:[^\s"]+|"[^"]*")'` (공백 단위로 쪼개되 쌍따옴표 내부 공백은 단일 토큰으로 보존)
 * **정규화**: `.strip('"')` 수행 후 `.lower()`로 표준화하여 대소문자 구분 없이 $O(1)$ 조회를 지원합니다.
+
+### 🔍 역색인(Inverted Index) 복잡도 분석 (Complexity Analysis)
+
+저장소 내 전체 커밋 수 $N$, 커밋 메시지의 평균 단어 수 $M$, 전체 단어/작성자 키워드의 총 가짓수 $K$라 할 때 역색인 구조의 복잡도는 다음과 같습니다.
+
+#### 1. 시간 복잡도 (Time Complexity)
+* **인덱스 빌드 (Build / Update): $O(N \cdot M)$**
+  * 각 커밋 생성 시 메시지를 토큰화(Tokenization) 및 정규화(`.strip()`, `.lower()`)하여 해시 테이블(Dict/Set)에 매핑합니다.
+  * 커밋 $1$개당 평균 $M$개의 키워드가 추출되므로 전체 $N$개 커밋에 대해 $O(N \cdot M)$의 시간이 소요됩니다.
+* **키워드/작성자 검색 (Search): $O(1)$**
+  * 정규화된 쿼리 키워드로 해시 테이블을 조회하므로 **평균 $O(1)$** 시간에 해당 키워드를 포함하는 커밋 해시 집합(`Set`)을 추출합니다. (단, 검색 결과 커밋 목록을 해시 사전순으로 정렬하는 과정에서 $O(R \log R)$ 소요, $R$은 매칭된 커밋 수)
+
+#### 2. 공간/메모리 복잡도 (Space Complexity)
+* **메모리 비용: $O(K + N \cdot M)$**
+  * `index_keyword` 및 `index_author` 딕셔너리에 저장되는 고유 키워드 수 $K$와, 각 키워드가 가리키는 커밋 해시 참조의 총 개수 $N \cdot M$에 비례합니다.
+  * 파이썬의 `Set` 구조를 활용하여 중복 참조를 제거하고, 커밋 객체 전체가 아닌 **해시 문자열(Pointer)만 인덱싱**함으로써 메모리 오버헤드를 최적화했습니다.
 
 ---
 

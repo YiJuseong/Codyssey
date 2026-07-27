@@ -55,6 +55,12 @@ class GitCommandHandler:
         return f"[{commit_hash}] Committed successfully: \"{message}\""
 
     def log(self, sort_option=None):
+        """
+        저장소의 커밋 로그를 조회합니다.
+        
+        :param sort_option: 정렬 옵션 (None: 위상 정렬, 'date': 날짜순, 'author': 작성자순)
+        :return: (커밋 리스트, 성공 여부) 튜플
+        """
         if not self.repo.is_initialized():
             return "Repository not initialized. Run INIT first.", False
             
@@ -101,6 +107,12 @@ class GitCommandHandler:
         return get_ancestors(self.repo.commits, target_hash), True
 
     def search(self, arg):
+        """
+        키워드 또는 작성자명(--author)을 기반으로 커밋을 검색합니다.
+        
+        :param arg: 검색 키워드 또는 '--author=이름' 형태의 인자
+        :return: (검색된 커밋 리스트, 성공 여부) 튜플
+        """
         result_hashes = set()
         if arg.startswith("--author="):
             author_query = arg.split("=")[1].lower()
@@ -118,6 +130,6 @@ class GitCommandHandler:
     
     def get_current_branch(self):
         """현재 활성화된 브랜치명을 동적으로 반환 (초기화 전이면 NO-REPO 반환)"""
-        if not self.repo.is_initialized or not self.repo.head_branch:
+        if not self.repo.is_initialized() or not self.repo.head_branch:
             return "NO-REPO"
         return self.repo.head_branch
