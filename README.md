@@ -1,1 +1,1 @@
-# Codyssey
+# Codyssey에서 진행한 과제를 모아둔 레포지토리입니다.
