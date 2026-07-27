@@ -69,7 +69,7 @@ class GitCommandHandler:
         # 2. 옵션별 분기 처리 (불필요한 위상 정렬 연산 방지)
         if sort_option is None:
             # 정렬 옵션이 없으면 부모-자식 위상 정렬
-            result = get_topological_sort(self.repo.commits, current_head)
+            result = get_topological_sort(self.repo.commits)
         elif sort_option == "date":
             # 전체 커밋 대상 날짜순 정렬
             commits_list = list(self.repo.commits.values())

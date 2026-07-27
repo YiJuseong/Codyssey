@@ -24,65 +24,37 @@ def _merge(left, right, compare_func):
     return result
 
 
-def get_topological_sort(commits_dict, start_hash):
-    """부모 커밋이 항상 자식 커밋보다 먼저 출력되도록 위상 정렬(Topological Sort)을 수행"""
-    if not start_hash:
+def get_topological_sort(commits_dict):
+    """저장소 내 모든 커밋(DAG)을 대상으로, 부모 커밋이 자식 커밋보다 먼저 나오도록 위상 정렬 수행"""
+    if not commits_dict:
         return []
 
-    adj = {}      # parent -> list of children
-    in_degree = {} # commit_hash -> int
-    
-    # 1. HEAD(start_hash)로부터 역방향(조상)으로 도달 가능한 모든 노드 수집
-    stack = [start_hash]
-    visited = set([start_hash])
-    all_nodes = set()
-    
-    while stack:
-        curr = stack.pop()
-        all_nodes.add(curr)
-        commit = commits_dict.get(curr)
-        if commit:
-            for p in commit.parents:
-                if p not in visited:
-                    visited.add(p)
-                    stack.append(p)
+    adj = {h: [] for h in commits_dict}
+    in_degree = {h: 0 for h in commits_dict}
 
-    # 차수 및 인접 리스트 초기화
-    for n in all_nodes:
-        in_degree[n] = 0
-        adj[n] = []
+    # 1. 부모 -> 자식 방향으로 간선과 진입 차수 설정
+    for h, commit in commits_dict.items():
+        for p in commit.parents:
+            if p in commits_dict:
+                adj[p].append(h)
+                in_degree[h] += 1
 
-    # 부모 -> 자식 방향으로 간선과 진입 차수(in-degree) 설정
-    for n in all_nodes:
-        commit = commits_dict.get(n)
-        if commit:
-            for p in commit.parents:
-                if p in all_nodes:
-                    adj[p].append(n)
-                    in_degree[n] += 1
-
-    # 진입 차수가 0인 노드(최상위 조상)들을 큐에 삽입 후 사전순 정렬
-    queue = [n for n in all_nodes if in_degree[n] == 0]
-    for i in range(len(queue)):
-        for j in range(i + 1, len(queue)):
-            if queue[i] > queue[j]:
-                queue[i], queue[j] = queue[j], queue[i]
+    # 2. 진입 차수가 0인 노드(뿌리 커밋들)를 큐에 삽입 후 정렬
+    queue = [h for h, deg in in_degree.items() if deg == 0]
+    queue = merge_sort(queue, lambda a, b: a < b)
 
     order = []
     while queue:
         curr = queue.pop(0)
         order.append(commits_dict[curr])
-        
+
         for neighbor in adj[curr]:
             in_degree[neighbor] -= 1
             if in_degree[neighbor] == 0:
                 queue.append(neighbor)
-                
-        # 동률일 때 일관된 순서를 유지하기 위해 정렬
-        for i in range(len(queue)):
-            for j in range(i + 1, len(queue)):
-                if queue[i] > queue[j]:
-                    queue[i], queue[j] = queue[j], queue[i]
+
+        # 동률 발생 시 일관성을 위해 정렬
+        queue = merge_sort(queue, lambda a, b: a < b)
 
     return order
 
