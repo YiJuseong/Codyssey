@@ -33,11 +33,11 @@ python main.py
 | **INIT** | `INIT [<user_name>]` | 저장소 초기화 (미입력 시 기본 사용자 'User') |
 | **COMMIT** | `COMMIT "message" [--author="name"]` | 커밋 생성 및 `head_branch` 이동 |
 | **BRANCH** | `BRANCH <branch_name>` | 브랜치 생성 |
-| **CHECKOUT**| `CHECKOUT <branch_name>` | `head_branch` 이동 |
+| **SWITCH**| `CHECKOUT <branch_name>` | `head_branch` 이동 |
 | **LOG** | `LOG` | 현재 브랜치의 커밋 히스토리 출력 |
 | **SEARCH** | `SEARCH "keyword"`<br>`SEARCH --author="name"` | 역색인 기반 커밋 검색 |
 | **PATH** | `PATH <start_hash> <end_hash>` | 두 커밋 간 최단 경로 탐색 |
-| **HELP** | `HELP` | 도움말 출력 |
+| **ANCESTORS** | `ANCESTORS <commit_hash>` | 해당 커밋에서 도달 가능한 모든 조상 커밋을 출력 |
 | **EXIT** | `EXIT` | 프로그램 종료 |
 
 ### 2.3 Quick Start Scenario
@@ -57,11 +57,20 @@ Branch 'feature-a' created.
 [main] > SWITCH feature-a
 Switched to branch 'feature-a'
 
-# 4. 신규 브랜치에서 작업 및 검색
+# 4. 신규 브랜치에서 커밋 추가 및 키워드로 검색
 [feature-a] > COMMIT "Fix bug in search engine" --author="Bob"
 [c2] Committed successfully: "Fix bug in search engine"
 [feature-a] > SEARCH bug
 [c2] Alice | 2026-07-27 15:21:03 | Fix bug in search engine
+
+# 5. 현재 모든 브랜치의 커밋 로그를 부모순으로 정렬해 출력
+[feature-a] > LOG
+[c1] Alice | 2026-07-29 13:47:03 | Initial commit
+[c2] Alice | 2026-07-29 13:47:36 | Fix bug in search engine
+
+# 6. 해당 커밋에서 도달 가능한 모든 조상 커밋을 출력
+[feature-a] > ANCESTORS c2
+[c1] Alice | 2026-07-29 13:47:03 | Initial commit
 ```
 
 ---
