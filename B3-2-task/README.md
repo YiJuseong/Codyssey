@@ -8,12 +8,10 @@
 
 ```text
 .
-├── main.py              # CLI 진입점 및 명령어 파싱/루프
-├── repo_handler.py      # GitCommandHandler (비즈니스 로직 및 예외 제어)
-├── models.py            # MiniGitRepository, Commit 데이터 모델
-├── utils.py             # Merge Sort, BFS 경로 탐색, 토큰화 유틸리티
-├── tests/
-│   └── test_system.py   # 유닛 테스트 (초기화 조건, 정렬 안정성, 동률 경로)
+├── main.py              # CLI 진입점 및 명령어 파싱
+├── commands.py          # GitCommandHandler (비즈니스 로직)
+├── models.py            # MiniGitRepository 저장소, Commit 객체 구조 정의
+├── algorithms.py        # Merge Sort, BFS 경로 탐색, 위상정렬
 └── README.md            # 기술 명세서
 ```
 
