@@ -126,8 +126,11 @@ Switched to branch 'feature-a'
 
 ### 3.6 역색인(Inverted Index) 및 토큰화 정규화 규칙
 
-* **토큰화 파싱**: `r'(?:[^\s"]+|"[^"]*")'` (공백 단위로 쪼개되 쌍따옴표 내부 공백은 단일 토큰으로 보존)
-* **정규화**: `.strip('"')` 수행 후 `.lower()`로 표준화하여 대소문자 구분 없이 $O(1)$ 조회를 지원합니다.
+텍스트의 공백을 제거하고 소문자로 정규화하고 특수문자 제거
+```
+tokens = text.lower().split()
+return [t.strip(",.?!\"'") for t in tokens if t.strip(",.?!\"'")]
+```
 
 ### 🔍 역색인(Inverted Index) 복잡도 분석 (Complexity Analysis)
 
@@ -135,7 +138,7 @@ Switched to branch 'feature-a'
 
 #### 1. 시간 복잡도 (Time Complexity)
 * **인덱스 빌드 (Build / Update): $O(N \cdot M)$**
-  * 각 커밋 생성 시 메시지를 토큰화(Tokenization) 및 정규화(`.strip()`, `.lower()`)하여 해시 테이블(Dict/Set)에 매핑합니다.
+  * 각 커밋 생성 시 메시지를 토큰화(Tokenization) 및 정규화(`.split()`, `.lower()`)하여 해시 테이블(Dict/Set)에 매핑합니다.
   * 커밋 $1$개당 평균 $M$개의 키워드가 추출되므로 전체 $N$개 커밋에 대해 $O(N \cdot M)$의 시간이 소요됩니다.
 * **키워드/작성자 검색 (Search): $O(1)$**
   * 정규화된 쿼리 키워드로 해시 테이블을 조회하므로 **평균 $O(1)$** 시간에 해당 키워드를 포함하는 커밋 해시 집합(`Set`)을 추출합니다. (단, 검색 결과 커밋 목록을 해시 사전순으로 정렬하는 과정에서 $O(R \log R)$ 소요, $R$은 매칭된 커밋 수)
@@ -149,6 +152,6 @@ Switched to branch 'feature-a'
 
 ### 3.7 대규모 데이터 확장 시 병목 분석 및 개선 제안
 
-* **병목 후보**: 전체 커밋 RAM 상주로 인한 메모리 오버헤드, 대규모 검색 결과 정렬 지연.
-* **개선 방안**: Embedded KV DB(RocksDB) 영속화, Priority Queue를 활용한 Top-K 부분 정렬, LRU Cache 도입.
+* **병목**: 대규모 검색 결과 정렬 지연.
+* **개선 방안**: 최소힙을 통해 화면에 출력하고자 하는 커밋 개수를 제한하는 식으로 연산량을 줄임.
 
