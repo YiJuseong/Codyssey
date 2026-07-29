@@ -114,7 +114,7 @@ Switched to branch 'feature-a'
 
 ### 3.5 역색인(Inverted Index) 및 토큰화 정규화 규칙
 
-텍스트의 공백을 제거하고 소문자로 정규화하고 특수문자 제거
+텍스트의 공백기준으로 나눠서 소문자로 정규화하고 특수문자 제거
 ```
 tokens = text.lower().split()
 return [t.strip(",.?!\"'") for t in tokens if t.strip(",.?!\"'")]
