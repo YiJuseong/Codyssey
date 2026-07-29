@@ -48,13 +48,17 @@ def get_topological_sort(commits_dict):
         curr = queue.pop(0)
         order.append(commits_dict[curr])
 
+        has_new_element = False
+
         for neighbor in adj[curr]:
             in_degree[neighbor] -= 1
             if in_degree[neighbor] == 0:
                 queue.append(neighbor)
+                has_new_element = True
 
         # 동률 발생 시 일관성을 위해 정렬
-        queue = merge_sort(queue, lambda a, b: a < b)
+        if has_new_element:
+            queue = merge_sort(queue, lambda a, b: a < b)
 
     return order
 
