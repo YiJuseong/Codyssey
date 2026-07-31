@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Portfolio</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header id="header">
+    <div class="nav-container">
+      <a href="#" class="logo">PORTFOLIO.</a>
+      <nav id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="#hero" class="nav-link">Home</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#skills" class="nav-link">Skills</a></li>
+          <li><a href="#projects" class="nav-link">Projects</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <button id="theme-toggle" aria-label="다크 모드 토글">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="hamburger" aria-label="메뉴 열기/닫기">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+      <div class="container hero-content animate-on-scroll">
+        <h1>안녕하세요,<br>성장을 지향하는 <span class="highlight">개발자</span>입니다.</h1>
+        <p>사용자 경험을 최우선으로 생각하며 지속적으로 도전하는 엔지니어입니다.</p>
+        <div class="hero-buttons">
+          <a href="#projects" class="btn btn-primary">프로젝트 보기</a>
+          <a href="#contact" class="btn btn-secondary">문의하기</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+      <div class="container animate-on-scroll">
+        <h2 class="section-title">About Me</h2>
+        <div class="about-grid">
+          <div class="about-image">
+            <img src="images/profile.jpg" alt="개발자 프로필 사진" onerror="this.src='https://via.placeholder.com/300x300?text=Profile+Image'">
+          </div>
+          <div class="about-text">
+            <h3>문제 해결을 즐기는 개발자</h3>
+            <p>새로운 기술을 배우고 효율적인 코드를 작성하는 것에 보람을 느낍니다. 깔끔한 시맨틱 마크업과 유지보수가 용이한 코드를 지향합니다.</p>
+            <ul class="about-info">
+              <li><strong>이름:</strong> 홍길동</li>
+              <li><strong>이메일:</strong> user@example.com</li>
+              <li><strong>학력/경력:</strong> 컴퓨터공학전공 / 프론트엔드 취준생</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="skills-section">
+      <div class="container animate-on-scroll">
+        <h2 class="section-title">Skills</h2>
+        <div class="skills-grid">
+          <div class="skill-card">
+            <i class="fa-brands fa-html5 skill-icon"></i>
+            <h3>HTML5</h3>
+            <p>시맨틱 마크업, 웹 접근성 준수</p>
+          </div>
+          <div class="skill-card">
+            <i class="fa-brands fa-css3-alt skill-icon"></i>
+            <h3>CSS3</h3>
+            <p>Flexbox, Grid, 반응형 레이아웃</p>
+          </div>
+          <div class="skill-card">
+            <i class="fa-brands fa-js skill-icon"></i>
+            <h3>JavaScript</h3>
+            <p>ES6+, DOM 조작, 비동기 API 연동</p>
+          </div>
+          <div class="skill-card">
+            <i class="fa-brands fa-git-alt skill-icon"></i>
+            <h3>Git & GitHub</h3>
+            <p>버전 관리 및 오픈소스 협업</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects-section">
+      <div class="container animate-on-scroll">
+        <h2 class="section-title">Projects</h2>
+        <div id="projects-container">
+          <!-- JS에서 동적으로 로딩/성공/에러/빈 상태를 렌더링합니다 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+      <div class="container animate-on-scroll">
+        <h2 class="section-title">Contact</h2>
+        <form id="contact-form" novalidate>
+          <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" placeholder="이름을 입력하세요">
+            <span class="error-message" id="name-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" placeholder="example@email.com">
+            <span class="error-message" id="email-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="message">메시지</label>
+            <textarea id="message" name="message" rows="5" placeholder="메시지를 입력하세요"></textarea>
+            <span class="error-message" id="message-error"></span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">보내기</button>
+          <div id="form-success" class="success-message"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; 2026 Developer. All rights reserved.</p>
+      <div class="social-links">
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll To Top Button -->
+  <button id="scroll-top" aria-label="페이지 맨 위로 이동">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+</body>
+</html>
