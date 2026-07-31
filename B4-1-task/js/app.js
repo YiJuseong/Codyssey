@@ -16,7 +16,7 @@ const state = {
 };
 
 // GitHub API 사용자 ID 설정 (본인 ID로 변경 가능)
-const GITHUB_USERNAME = 'octocat';
+const GITHUB_USERNAME = 'YiJuseong';
 
 /* ==========================================================================
    1. DOM Elements Selection
