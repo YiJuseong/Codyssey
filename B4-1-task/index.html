@@ -57,7 +57,7 @@
         <h2 class="section-title">About Me</h2>
         <div class="about-grid">
           <div class="about-image">
-            <img src="images/profile.jpg" alt="개발자 프로필 사진" onerror="this.src='https://via.placeholder.com/300x300?text=Profile+Image'">
+           <img src="profile.jpg" alt="프로필 이미지" id="profile-img">
           </div>
           <div class="about-text">
             <h3>문제 해결을 즐기는 개발자</h3>
@@ -105,6 +105,18 @@
     <section id="projects" class="projects-section">
       <div class="container animate-on-scroll">
         <h2 class="section-title">Projects</h2>
+        <!-- 언어 필터 드롭다운 UI  -->
+        <div class="filter-container">
+          <label for="language-filter" class="filter-label">언어별 필터</label>
+          <select id="language-filter" class="filter-select">
+            <option value="all">전체 보기</option>
+            <option value="JavaScript">JavaScript</option>
+            <option value="TypeScript">TypeScript</option>
+            <option value="HTML">HTML</option>
+            <option value="CSS">CSS</option>
+            <option value="Python">Python</option>
+          </select>
+        </div>
         <div id="projects-container">
           <!-- JS에서 동적으로 로딩/성공/에러/빈 상태를 렌더링합니다 -->
         </div>

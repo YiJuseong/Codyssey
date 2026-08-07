@@ -4,6 +4,7 @@
 const state = {
   theme: localStorage.getItem('theme') || 'light',
   isMenuOpen: false,
+  selectedLanguage: 'all',
   projects: {
     data: [],
     status: 'IDLE', // IDLE, LOADING, SUCCESS, ERROR, EMPTY
@@ -31,6 +32,8 @@ const elements = {
   scrollTopBtn: document.getElementById('scroll-top'),
   projectsContainer: document.getElementById('projects-container'),
   contactForm: document.getElementById('contact-form'),
+  profileImg: document.getElementById('profile-img'),
+  languageFilter: document.querySelector('#language-filter'),
   formInputs: {
     name: document.getElementById('name'),
     email: document.getElementById('email'),
@@ -70,6 +73,7 @@ const renderNavMenu = () => {
 // Projects 섹션 API 상태별 렌더링
 const renderProjects = () => {
   const { status, data, error } = state.projects;
+  const selectedLanguage = state.selectedLanguage || 'all'; // ✨ 선택된 언어 상태 가져오기
 
   if (status === 'LOADING') {
     elements.projectsContainer.innerHTML = `
@@ -102,7 +106,24 @@ const renderProjects = () => {
   }
 
   if (status === 'SUCCESS') {
-    const cardsHTML = data
+    // ✨ 1. 선택된 언어 상태에 따라 data 배열 filter() 수행
+    const filteredData = data.filter((project) => {
+      if (selectedLanguage === 'all') return true;
+      return project.language === selectedLanguage;
+    });
+
+    // ✨ 2. 필터링 결과 해당 언어의 프로젝트가 0개일 때 예외 처리
+    if (filteredData.length === 0) {
+      elements.projectsContainer.innerHTML = `
+        <div class="state-container">
+          <p>해당 언어로 작성된 프로젝트가 없습니다.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // ✨ 3. 필터링된 배열(filteredData)로 카드 HTML 생성
+    const cardsHTML = filteredData
       .map(({ name, description, html_url, stargazers_count, language }) => `
         <article class="project-card">
           <div>
@@ -271,6 +292,18 @@ const setupScrollAnimation = () => {
   document.querySelectorAll('.animate-on-scroll').forEach((el) => observer.observe(el));
 };
 
+// 이미지 로드 실패(error) 처리 
+const handleImageError = (e) => {
+  e.target.src = 'https://via.placeholder.com/300x300?text=Profile+Image';
+};
+
+if (elements.languageFilter) {
+  elements.languageFilter.addEventListener('change', (e) => {
+    state.selectedLanguage = e.target.value; // 선택된 값으로 상태 업데이트
+    renderProjects();                       // 변경된 상태로 화면 다시 렌더링
+  });
+}
+
 /* ==========================================================================
    4. Event Listeners Initializer
    ========================================================================== */
@@ -307,6 +340,12 @@ const initEventListeners = () => {
     });
   });
 };
+
+// 이미지 로드 실패 이벤트
+if (elements.profileImg) {
+  // { once: true } 옵션을 주면 대체 이미지마저 로드 실패했을 때 일어나는 무한 루프 에러를 방지할 수 있습니다.
+  elements.profileImg.addEventListener('error', handleImageError, { once: true });
+}
 
 /* ==========================================================================
    5. App Initialization

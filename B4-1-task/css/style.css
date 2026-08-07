@@ -493,6 +493,19 @@ footer {
     flex-direction: row;
   }
 }
+/* desktop (1024px 이상) */
+@media (min-width: 1024px) {
+  /* 큰 화면에서 폰트 크기를 살짝 더 키워 시원하게 표시 */
+  .hero-content h1 {
+    font-size: 4rem;
+  }
+
+  /* 대형 모니터에서 본문이 좌우로 너무 벌어지지 않도록 너비 제한 */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
 
 /* Mobile (767px 이하) */
 @media (max-width: 767px) {
