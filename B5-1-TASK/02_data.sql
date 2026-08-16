@@ -69,3 +69,7 @@ INSERT INTO rental (member_id, book_id, rental_date, return_date) VALUES
 (7, 8, '2026-08-07', '2026-08-14'),
 (8, 9, '2026-08-08', '2026-08-15'),
 (9, 10, '2026-08-09', NULL);         -- 윤서준: 서양미술사 (대여 중)
+
+--참조 무결성 검증--
+INSERT INTO rental (member_id, book_id, rental_date, return_date) 
+VALUES(99, 1, '2026-08-16', NULL);
