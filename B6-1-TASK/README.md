@@ -63,8 +63,7 @@ echo "OK" | sudo tee /var/www/html/health
 - **응답 결과**: `HTTP/1.1 200 OK` 및 본문 `OK` 반환 확인
 
 ### 외부 접속 검증 스크린샷
-![Health Check Proof](images/health-check.png)
-
+![Health Check Proof](./images/Health-Check.png)
 ---
 
 ## 4. 트러블슈팅 요약
