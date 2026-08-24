@@ -25,8 +25,15 @@
 ## 2. 실습 진행 과정
 
 ### 1단계: 사전 준비 및 IAM 구성
-- 루트 계정 대신 최소 권한(`AmazonEC2FullAccess`, `AmazonVPCFullAccess`)이 부여된 IAM 사용자를 생성하여 콘솔에 접근했습니다.
+- 루트 계정 대신 권한(`AmazonEC2FullAccess`, `AmazonVPCFullAccess`)이 부여된 IAM 사용자를 생성하여 콘솔에 접근했습니다.
 - 작업 리전을 **서울(`ap-northeast-2`)**로 고정했습니다.
+
+**실무 표준: 점진적 권한 확대 운영 절차 (Gradual Permission Escalation)**:
+  1. **초기 기준 권한 (Read-Only)**: 평상시 및 일상 모니터링 시에는 `ReadOnlyAccess` 또는 리소스 조회(`Describe*`) 권한만 기본 부여하여 실수에 의한 리소스 변경/삭제 위험을 차단합니다.
+  2. **필요 시 권한 확대 (Task-Specific Escalation)**: 인프라 생성 및 배포 작업 발생 시, 작업 범위에 국한된 최소 권한 정책(예: 특정 태그 기반의 `RunInstances`, `AuthorizeSecurityGroupIngress` 등)을 사전에 정의된 변경 관리 절차를 통해 일시적으로 승인 및 부여합니다.
+  3. **작업 로깅 및 감사 (Auditing)**: 권한이 부여된 동안 수행된 모든 생성/변경/삭제 API 호출은 **AWS CloudTrail**에 기록되어 비인가 접근 여부를 추적합니다.
+  4. **권한 회수 및 만료 (Revoke)**: 작업 완료 후에는 즉시 추가 권한을 회수하거나, IAM Role 임시 자격 증명의 세션 만료 시간(Session Timeout)을 활용해 기본 최소 권한 상태로 복귀시킵니다.
+
 
 ### 2단계: 네트워크 및 보안 그룹 구축
 - **VPC 및 Subnet**: CIDR `10.0.0.0/16`의 VPC와 `10.0.1.0/24`의 Public Subnet을 생성하고, 퍼블릭 IPv4 자동 할당을 활성화했습니다.
