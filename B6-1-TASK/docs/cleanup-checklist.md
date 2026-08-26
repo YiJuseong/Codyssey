@@ -9,7 +9,6 @@
 | 리소스 구분 | 리소스 이름 | 적용 태그 (Key-Value) | 조치 내용 | 최종 상태 | 비고 |
 | :--- | :--- | :--- | :--- | :---: | :--- |
 | **EC2 인스턴스** | `task-web-server` | `Name=task-web-server`<br>`Project=SingleTier-Task`<br>`Environment=Dev`<br>`Owner=LeeJusung` | 인스턴스 종료(Terminate) | **종료됨 (Terminated)** | 과금 중단 완료 |
-| **EBS 볼륨** | `task-web-server-root` (8 GiB) | `Name=task-web-server-root`<br>`Project=SingleTier-Task`<br>`Environment=Dev`<br>`Owner=LeeJusung` | 루트 볼륨 자동 삭제 확인 | **삭제됨 (Deleted)** | '인스턴스 종료 시 삭제' 옵션 적용 |
 | **탄력적 IP (EIP)** | - | - | 사용하지 않음 (퍼블릭 IP 자동할당 사용) | **해당 없음** | 잔여 EIP 없음 |
 | **보안 그룹** | `web-sg` | `Name=web-sg`<br>`Project=SingleTier-cloud-Task`<br>`Environment=Dev`<br>`Owner=LeeJusung` | 보안 그룹 삭제 | **삭제됨 (Deleted)** | 기본 보안 그룹만 유지 |
 | **서브넷** | `task-public-subnet-2a` | `Name=task-public-subnet-2a`<br>`Project=SingleTier-cloud-Task`<br>`Environment=Dev`<br>`Owner=LeeJusung` | 서브넷 삭제 | **삭제됨 (Deleted)** | - |
