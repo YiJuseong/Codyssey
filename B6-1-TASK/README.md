@@ -66,7 +66,7 @@ echo "OK" | sudo tee /var/www/html/health
 
 - **검증 방식**: **(B) GET `http://<퍼블릭IP>/health` 호출**
 - **접속 대상 IP**: `3.35.135.178`
-- **검증 URL**: `[http://3.35.135.178/health](http://3.35.135.178/health)`
+- **검증 URL**: `http://3.35.135.178/health`
 - **응답 결과**: `HTTP/1.1 200 OK` 및 본문 `OK` 반환 확인
 
 ### 외부 접속 검증 스크린샷
@@ -89,5 +89,3 @@ echo "OK" | sudo tee /var/www/html/health
 | **아키텍처 다이어그램** | `docs/architecture.png` | VPC/Subnet/IGW/EC2/SG 및 트래픽 흐름도 |
 | **트러블슈팅 보고서** | `docs/troubleshooting.md` | 증상-가설-검증-조치-결과-재발방지 상세 기록 |
 | **리소스 정리 체크리스트** | `docs/cleanup-checklist.md` | 과금 방지를 위한 리소스 삭제 완료 내역 |
-
-*실습 완료 후 불필요한 과금을 방지하기 위해 EC2 인스턴스 종료, 보안 그룹, IGW 및 VPC 삭제를 완료했습니다.*
