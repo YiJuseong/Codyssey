@@ -144,10 +144,6 @@ def display_output(command_type, result_text):
     if command_type == "commit":
         if len(first_line) > 72:
             warnings.append(f"커밋 제목이 72자를 초과했습니다 ({len(first_line)}자 / 권장: 50~72자).")
-        
-        bullets = [l for l in lines[1:] if l.startswith(("- ", "* "))]
-        if len(lines) > 1 and len(bullets) == 0:
-            warnings.append("커밋 본문에 상세 변경 내역을 나타내는 불릿('- ' 또는 '* ')이 없습니다.")
 
     # 2. PR 본문 템플릿 규칙 검증
     elif command_type == "pr":
