@@ -33,7 +33,7 @@ def get_git_changes(command_type="commit", base_branch="main"):
 
             # 베이스 대비 커밋 로그 수집
             log_res = subprocess.run(
-                ["git", "log", f"{target_base}...HEAD", "--oneline"],
+                ["git", "log", f"{target_base}..HEAD", "--oneline"],
                 capture_output=True, text=True, check=True
             )
             commit_logs = log_res.stdout.strip()
