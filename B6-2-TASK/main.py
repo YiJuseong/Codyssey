@@ -167,12 +167,6 @@ def display_output(command_type, result_text):
             missing_str = ", ".join(f"'### {h}'" for h in missing_headers)
             warnings.append(f"PR 필수 섹션이 누락되었습니다: {missing_str}")
 
-        # 본문 불릿 포인트 개수 검증 (최소 3개 권장)
-        bullets = [l for l in lines if l.startswith(("- ", "* "))]
-        min_expected_bullets = 3
-        if len(bullets) < min_expected_bullets:
-            warnings.append(f"PR 본문 변경 내역 불릿 수가 부족합니다 ({len(bullets)}개 / 권장: 최소 {min_expected_bullets}개 이상).")
-
     # 검증 피드백 출력
     if warnings:
         print("\n[구조 검증 경고]")
