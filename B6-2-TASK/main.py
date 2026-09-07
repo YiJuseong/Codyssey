@@ -128,25 +128,57 @@ def generate_ai_draft(command_type, status_text, diff_text, model, temperature, 
         print(f"[오류] AI API 호출 실패: {str(e)}")
         sys.exit(1)
 
-
 def display_output(command_type, result_text):
-    """결과물을 터미널 구획선으로 분리하고 길이 제약 등을 검증/출력하는 함수"""
-    lines = result_text.splitlines()
+    """결과물을 터미널 구획선으로 분리하고 길이 제약, 섹션 구조, 불릿 수를 종합 검증/출력하는 함수"""
+    lines = [line.strip() for line in result_text.splitlines() if line.strip()]
     first_line = lines[0] if lines else ""
 
     print("\n" + "=" * 65)
     print(f"       AI 생성 결과: {command_type.upper()} 초안 (검토 후 복사하여 사용)")
+    print(" [주의] 환각·민감정보 포함 여부를 확인 후 커밋에 반영하세요.")
     print("=" * 65)
 
-    # 길이 검증 피드백
-    if command_type == "commit" and len(first_line) > 72:
-        print(f"[알림] 커밋 제목이 72자를 초과했습니다 ({len(first_line)}자). 검토 후 조정하세요.\n")
-    elif command_type == "pr" and len(first_line) > 80:
-        print(f"[알림] PR 제목이 80자를 초과했습니다 ({len(first_line)}자). 검토 후 조정하세요.\n")
+    warnings = []
 
+# 1. 커밋 메시지 규칙 검증
+    if command_type == "commit":
+        # 제목 길이 검증
+        if len(first_line) > 72:
+            warnings.append(f"커밋 제목이 72자를 초과했습니다 ({len(first_line)}자 / 권장: 50~72자).")
+        
+        # 본문 불릿 포인트 확인 (본문이 있는 경우 최소 1개 이상 권장)
+        bullets = [l for l in lines[1:] if l.startswith(("- ", "* "))]
+        if len(lines) > 1 and len(bullets) == 0:
+            warnings.append("커밋 본문에 상세 변경 내역을 나타내는 불릿('- ' 또는 '* ')이 없습니다.")
+
+    # 2. PR 본문 템플릿 규칙 검증
+    elif command_type == "pr":
+        # 제목 길이 검증
+        if len(first_line) > 80:
+            warnings.append(f"PR 제목이 80자를 초과했습니다 ({len(first_line)}자 / 권장: 80자 이내).")
+
+        # 필수 마크다운 섹션 헤더(##) 포함 여부 검사
+        # (예: ## 개요/설명, ## 변경 사항 등)
+        sections = [l for l in lines if l.startswith("## ")]
+        if len(sections) < 2:
+            warnings.append(f"PR 필수 섹션(##)이 부족합니다 (감지된 섹션: {len(sections)}개 / 권장: 최소 2개 이상).")
+
+        # 전체 불릿 포인트 개수 검증 (일반적으로 변경사항 상세 목록에 최소 2~3개 이상 요구)
+        bullets = [l for l in lines if l.startswith(("- ", "* "))]
+        min_expected_bullets = 3
+        if len(bullets) < min_expected_bullets:
+            warnings.append(f"PR 본문 변경 내역 불릿 수가 부족합니다 (감지된 불릿: {len(bullets)}개 / 권장: 최소 {min_expected_bullets}개 이상).")
+
+    # 검증 피드백 출력
+    if warnings:
+        print("\n[구조 검증 경고]")
+        for w in warnings:
+            print(f" - {w}")
+        print()
+
+    # 최종 결과물 렌더링
     print(result_text)
     print("=" * 65 + "\n")
-
 
 def main():
     """CLI 옵션 정의 및 전체 파이프라인 제어"""
