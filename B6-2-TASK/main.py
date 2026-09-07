@@ -7,39 +7,72 @@ from google import genai
 from google.genai import types
 
 
-def get_git_changes():
-    """Git 변경 사항(status, diff)을 수집하고 변경 유무를 검증하는 함수"""
+def get_git_changes(command_type="commit", base_branch="main"):
+    """Git 변경 사항을 수집하는 함수 (commit: 로컬 작업트리 / pr: 베이스 브랜치 대비 커밋 누적 diff)"""
     try:
-        # 1. 파일 상태 수집
+        # 최상단에서 Git 저장소 여부 먼저 검증 (아니면 바로 CalledProcessError 발생)
+        subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], capture_output=True, text=True, check=True)
+
+        # --- PR 분기 ---
+        if command_type == "pr":
+            # 베이스 브랜치 존재 확인 (로컬에 없으면 origin/ 확인)
+            target_base = base_branch
+            check_base = subprocess.run(
+                ["git", "rev-parse", "--verify", target_base],
+                capture_output=True, text=True
+            )
+            if check_base.returncode != 0:
+                target_base = f"origin/{base_branch}"
+                check_remote = subprocess.run(
+                    ["git", "rev-parse", "--verify", target_base],
+                    capture_output=True, text=True
+                )
+                if check_remote.returncode != 0:
+                    print(f"[오류] 베이스 브랜치 '{base_branch}'(또는 '{target_base}')를 찾을 수 없습니다.")
+                    sys.exit(1)
+
+            # 베이스 대비 커밋 로그 수집
+            log_res = subprocess.run(
+                ["git", "log", f"{target_base}...HEAD", "--oneline"],
+                capture_output=True, text=True, check=True
+            )
+            commit_logs = log_res.stdout.strip()
+
+            # 베이스 대비 전체 diff 수집
+            diff_res = subprocess.run(
+                ["git", "diff", f"{target_base}...HEAD"],
+                capture_output=True, text=True, check=True
+            )
+            diff_text = diff_res.stdout.strip()
+
+            if not diff_text and not commit_logs:
+                print(f"\n[알림] '{target_base}' 브랜치 대비 새로운 커밋이나 변경점이 없습니다.")
+                sys.exit(0)
+
+            status_text = f"[커밋 히스토리 ({target_base}...HEAD)]\n{commit_logs}" if commit_logs else "[커밋 없음]"
+            return status_text, diff_text
+
+        # --- Commit 분기 (기존 유지) ---
         status_res = subprocess.run(
             ["git", "status", "--porcelain"],
-            capture_output=True,
-            text=True,
-            check=True
+            capture_output=True, text=True, check=True
         )
         status_text = status_res.stdout.strip()
 
-        # 변경 사항이 없을 경우 즉시 정상 종료
         if not status_text:
             print("\n[알림] 변경 사항이 없습니다. 작업 트리가 깨끗합니다.")
             sys.exit(0)
 
-        # 2. Staged 변경 사항 수집 (git diff --cached)
         diff_res = subprocess.run(
             ["git", "diff", "--cached"],
-            capture_output=True,
-            text=True,
-            check=True
+            capture_output=True, text=True, check=True
         )
         diff_text = diff_res.stdout.strip()
 
-        # Staged diff가 없으면 Unstaged diff 수집
         if not diff_text:
             diff_res = subprocess.run(
                 ["git", "diff"],
-                capture_output=True,
-                text=True,
-                check=True
+                capture_output=True, text=True, check=True
             )
             diff_text = diff_res.stdout.strip()
 
@@ -48,8 +81,8 @@ def get_git_changes():
     except FileNotFoundError:
         print("[오류] Git이 설치되어 있지 않거나 환경변수 PATH에 등록되지 않았습니다.")
         sys.exit(1)
-    except subprocess.CalledProcessError:
-        print("[오류] 현재 디렉토리가 Git 저장소가 아닙니다. 'git init' 후 실행하세요.")
+    except subprocess.CalledProcessError as e:
+        print(f"[오류] Git 명령어 실행 실패: {e}")
         sys.exit(1)
 
 
@@ -105,7 +138,8 @@ def generate_ai_draft(command_type, status_text, diff_text, model, temperature, 
             "### How to Test"
         )
 
-    user_content = f"### Git Status\n{status_text}\n\n### Git Diff\n{diff_text}"
+    status_label = "Git Commit History" if command_type == "pr" else "Git Status"
+    user_content = f"### {status_label}\n{status_text}\n\n### Git Diff\n{diff_text}"
 
     try:
         # 단 1회 호출로 제약사항 준수
@@ -184,13 +218,19 @@ def main():
     parser.add_argument("command", choices=["commit", "pr"], help="생성할 작업 선택 (commit 또는 pr)")
     parser.add_argument("--model", default="gemini-3.6-flash", help="사용할 Gemini 모델 (기본값: gemini-3.6-flash)")
     parser.add_argument("--temperature", type=float, default=0.2, help="생성 온도 (기본값: 0.2)")
-    parser.add_argument("--max-tokens", type=int, default=500, help="최대 생성 토큰 수 (기본값: 500)")
+    parser.add_argument("--max-tokens", type=int, default=None, help="최대 생성 토큰 수 (미지정 시 commit: 500, pr: 1000)")
     parser.add_argument("--no-safe-mode", dest="safe_mode", action="store_false", default=True, help="안전 모드 비활성화")
+    parser.add_argument("--base-branch", default="main", help="PR 비교 대상 베이스 브랜치 (기본값: main)")
 
     args = parser.parse_args()
 
+    if args.max_tokens is None:
+        max_tokens = 1000 if args.command == "pr" else 500
+    else:
+        max_tokens = args.max_tokens
+
     # 1. Git 변경 사항 수집
-    status_text, diff_text = get_git_changes()
+    status_text, diff_text = get_git_changes(command_type=args.command, base_branch=args.base_branch)
 
     # 2. 민감정보 마스킹 및 diff 축약
     processed_diff = apply_safe_mode(diff_text, safe_mode=args.safe_mode)
@@ -202,7 +242,7 @@ def main():
         diff_text=processed_diff,
         model=args.model,
         temperature=args.temperature,
-        max_tokens=args.max_tokens
+        max_tokens=max_tokens
     )
 
     # 4. 검증 및 결과 구획 출력
