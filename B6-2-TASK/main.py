@@ -129,7 +129,7 @@ def generate_ai_draft(command_type, status_text, diff_text, model, temperature, 
         sys.exit(1)
 
 def display_output(command_type, result_text):
-    """결과물을 터미널 구획선으로 분리하고 길이 제약, 섹션 구조, 불릿 수를 종합 검증/출력하는 함수"""
+    """결과물을 터미널 구획선으로 분리하고 길이 제약, 필수 섹션(Why/What/How to Test), 불릿 수를 종합 검증/출력하는 함수"""
     lines = [line.strip() for line in result_text.splitlines() if line.strip()]
     first_line = lines[0] if lines else ""
 
@@ -140,34 +140,42 @@ def display_output(command_type, result_text):
 
     warnings = []
 
-# 1. 커밋 메시지 규칙 검증
+    # 1. 커밋 메시지 규칙 검증
     if command_type == "commit":
-        # 제목 길이 검증
         if len(first_line) > 72:
             warnings.append(f"커밋 제목이 72자를 초과했습니다 ({len(first_line)}자 / 권장: 50~72자).")
         
-        # 본문 불릿 포인트 확인 (본문이 있는 경우 최소 1개 이상 권장)
         bullets = [l for l in lines[1:] if l.startswith(("- ", "* "))]
         if len(lines) > 1 and len(bullets) == 0:
             warnings.append("커밋 본문에 상세 변경 내역을 나타내는 불릿('- ' 또는 '* ')이 없습니다.")
 
     # 2. PR 본문 템플릿 규칙 검증
     elif command_type == "pr":
-        # 제목 길이 검증
         if len(first_line) > 80:
             warnings.append(f"PR 제목이 80자를 초과했습니다 ({len(first_line)}자 / 권장: 80자 이내).")
 
-        # 필수 마크다운 섹션 헤더(##) 포함 여부 검사
-        # (예: ## 개요/설명, ## 변경 사항 등)
-        sections = [l for l in lines if l.startswith("## ")]
-        if len(sections) < 2:
-            warnings.append(f"PR 필수 섹션(##)이 부족합니다 (감지된 섹션: {len(sections)}개 / 권장: 최소 2개 이상).")
+        # 필수 헤더 명시적 검증 ('Why', 'What', 'How to Test')
+        # 마크다운 헤더 기호(## 또는 ###) 및 대소문자 차이를 감안한 정규식 매칭
+        required_headers = {
+            "Why": r"(?i)^#{2,3}\s*(why|작업\s*배경|배경)",
+            "What": r"(?i)^#{2,3}\s*(what|주요\s*변경\s*사항|변경\s*사항)",
+            "How to Test": r"(?i)^#{2,3}\s*(how\s*to\s*test|테스트\s*방법|테스트)"
+        }
 
-        # 전체 불릿 포인트 개수 검증 (일반적으로 변경사항 상세 목록에 최소 2~3개 이상 요구)
+        missing_headers = []
+        for header_name, pattern in required_headers.items():
+            if not any(re.match(pattern, line) for line in lines):
+                missing_headers.append(header_name)
+
+        if missing_headers:
+            missing_str = ", ".join(f"'### {h}'" for h in missing_headers)
+            warnings.append(f"PR 필수 섹션이 누락되었습니다: {missing_str}")
+
+        # 본문 불릿 포인트 개수 검증 (최소 3개 권장)
         bullets = [l for l in lines if l.startswith(("- ", "* "))]
         min_expected_bullets = 3
         if len(bullets) < min_expected_bullets:
-            warnings.append(f"PR 본문 변경 내역 불릿 수가 부족합니다 (감지된 불릿: {len(bullets)}개 / 권장: 최소 {min_expected_bullets}개 이상).")
+            warnings.append(f"PR 본문 변경 내역 불릿 수가 부족합니다 ({len(bullets)}개 / 권장: 최소 {min_expected_bullets}개 이상).")
 
     # 검증 피드백 출력
     if warnings:
@@ -176,7 +184,7 @@ def display_output(command_type, result_text):
             print(f" - {w}")
         print()
 
-    # 최종 결과물 렌더링
+    # 최종 결과물 출력
     print(result_text)
     print("=" * 65 + "\n")
 
