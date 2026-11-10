@@ -37,8 +37,8 @@ def numerical_gradient(function, point: np.ndarray, h: float = 1e-6) -> np.ndarr
     """
     if h <= 0.0:
         raise ValueError("간격 h는 양수여야 한다.")
-    vector = np.asarray(point, dtype=float).reshape(-1)
-    gradient = np.zeros_like(vector)
+    vector = np.asarray(point, dtype=float).reshape(-1) # 매개변수로 받은 자료구조를 1차원 벡터 배열로 변환
+    gradient = np.zeros_like(vector) # 0으로 채워진 매개변수와 크기와 타입이 같은 자료구조 생성
     for index in range(vector.size):
         forward = vector.copy()
         backward = vector.copy()
@@ -57,8 +57,8 @@ def softmax(logits: np.ndarray) -> np.ndarray:
     같은 상수를 곱하므로 값을 바꾸지 않는다. 출력 성분의 합은 1이다.
     """
     values = np.asarray(logits, dtype=float).reshape(-1)
-    shifted = values - np.max(values)
-    exponential = np.exp(shifted)
+    shifted = values - np.max(values) # 배열중 최대값을 각 원소에 모두 뺴기 연산
+    exponential = np.exp(shifted) # 각 원소의 지수함수값 연산
     total = np.sum(exponential)
     if total == 0.0:
         raise ValueError("소프트맥스 분모가 0이다.")
@@ -68,7 +68,7 @@ def softmax(logits: np.ndarray) -> np.ndarray:
 def quadratic_bowl(point: np.ndarray) -> float:
     """f(x, y) = x^2 + y^2."""
     vector = np.asarray(point, dtype=float).reshape(-1)
-    return float(np.dot(vector, vector))
+    return float(np.dot(vector, vector)) # 벡터의 내적 또는 행렬곱 연산
 
 
 def analytical_gradient_quadratic_bowl(point: np.ndarray) -> np.ndarray:
@@ -86,9 +86,9 @@ def plot_gradient_field(
     등고선에 수직이다. 반환값은 격자점에서 |단위 기울기 · 접선|의 최댓값이다.
     접선은 (-y, x)이고, 이 값이 0에 가까우면 수직이다.
     """
-    coordinates = np.linspace(-grid_limit, grid_limit, 200)
-    x_grid, y_grid = np.meshgrid(coordinates, coordinates)
-    values = x_grid ** 2 + y_grid ** 2
+    coordinates = np.linspace(-grid_limit, grid_limit, 200) # -3부터 3까지 균일한 범위로 200개 원소로 나눠서 벡터 배열 생성
+    x_grid, y_grid = np.meshgrid(coordinates, coordinates) # 1차원 벡터를 2차원 행렬로 변환
+    values = x_grid ** 2 + y_grid ** 2 # 200x200 두 행렬의 각 원소의 제곱합을 원소로 갖는 2차원 행렬 생성
 
     sample_axis = np.array([-2.0, -1.0, 0.0, 1.0, 2.0])
     sample_x, sample_y = np.meshgrid(sample_axis, sample_axis)
@@ -96,18 +96,18 @@ def plot_gradient_field(
     sample_y = sample_y.ravel()
     keep = np.logical_not((sample_x == 0.0) & (sample_y == 0.0))
     sample_x = sample_x[keep]
-    sample_y = sample_y[keep]
+    sample_y = sample_y[keep] # 원점에서 크기가 0이 되어 나중에 분모가 0이 되는 에러예외 처리
     grad_x = 2.0 * sample_x
-    grad_y = 2.0 * sample_y
+    grad_y = 2.0 * sample_y # 각 점의 기울기 계산
 
     tangent_x = -sample_y
-    tangent_y = sample_x
-    grad_norm = np.hypot(grad_x, grad_y)
+    tangent_y = sample_x # 접선 벡터 좌표 계산
+    grad_norm = np.hypot(grad_x, grad_y) # 벡터 크기 계산
     tangent_norm = np.hypot(tangent_x, tangent_y)
     alignment = np.abs(
         (grad_x / grad_norm) * (tangent_x / tangent_norm)
         + (grad_y / grad_norm) * (tangent_y / tangent_norm)
-    )
+    ) # 두 벡터의 내적계산
     max_alignment = float(np.max(alignment))
 
     figure, axis = plt.subplots(figsize=(6.6, 6.2))
