@@ -1,0 +1,75 @@
+{
+  "area_relative_error": {
+    "rotation": 0.0,
+    "scaling": 0.0,
+    "shear": 6.661338147750939e-16
+  },
+  "area_ratio": {
+    "rotation": 1.0,
+    "scaling": 1.0,
+    "shear": 0.9999999999999993
+  },
+  "determinant": {
+    "rotation": 1.0,
+    "scaling": 1.0,
+    "shear": 1.0
+  },
+  "power_iteration_eigenvalue": -2.810469319174036,
+  "reference_eigenvalue": -2.810469319174037,
+  "power_iteration_relative_error": 3.160249477340497e-16,
+  "central_difference_at_3": 6.000000000838668,
+  "central_difference_abs_error": 8.386678018723615e-10,
+  "gradient_tangent_dot_max": 0.0,
+  "vanilla_gd_radius_100": 1.1523215619096607e-09,
+  "momentum_bowl_radius_100": 0.016130017117911965,
+  "learning_rate_final_radius": {
+    "0.1": 0.38873606399693444,
+    "0.5": 0.0,
+    "1.0": 5.656854249492381,
+    "1.2": 320.7091991405416
+  },
+  "ellipse_vanilla_radius_80": 1.5000000000000009,
+  "ellipse_momentum_radius_80": 0.033382415352686344,
+  "svd_relative_frobenius": {
+    "10": 0.10858564039408566,
+    "50": 8.527307188270761e-05,
+    "100": 5.504107835260505e-15
+  },
+  "softmax_gap": 2.220446049250313e-16,
+  "backprop_rounded": {
+    "z1": [
+      0.1,
+      0.3
+    ],
+    "a1": [
+      0.525,
+      0.5744
+    ],
+    "z2": 0.6072,
+    "y_pred": 0.6473,
+    "dL_dy": -1.5449,
+    "dL_dz2": -0.3527,
+    "dL_dW2": [
+      -0.1852,
+      -0.2026
+    ],
+    "dL_da1": [
+      -0.1764,
+      -0.2116
+    ],
+    "dL_dz1": [
+      -0.044,
+      -0.0517
+    ],
+    "dL_dW1": [
+      [
+        -0.044,
+        -0.0
+      ],
+      [
+        -0.0517,
+        -0.0
+      ]
+    ]
+  }
+}

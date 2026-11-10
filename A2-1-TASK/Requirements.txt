@@ -1,0 +1,6 @@
+numpy>=1.21
+matplotlib>=3.4
+seaborn>=0.11
+# 노트북 실행용 (선택)
+jupyter>=1.0
+nbconvert>=7.0
