@@ -92,7 +92,7 @@ def plot_gradient_field(
 
     sample_axis = np.array([-2.0, -1.0, 0.0, 1.0, 2.0])
     sample_x, sample_y = np.meshgrid(sample_axis, sample_axis)
-    sample_x = sample_x.ravel()
+    sample_x = sample_x.ravel() # 다차원 배열을 1차원 벡터로 변환
     sample_y = sample_y.ravel()
     keep = np.logical_not((sample_x == 0.0) & (sample_y == 0.0))
     sample_x = sample_x[keep]
@@ -101,7 +101,7 @@ def plot_gradient_field(
     grad_y = 2.0 * sample_y # 각 점의 기울기 계산
 
     tangent_x = -sample_y
-    tangent_y = sample_x # 접선 벡터 좌표 계산
+    tangent_y = sample_x # 접선 벡터 계산
     grad_norm = np.hypot(grad_x, grad_y) # 벡터 크기 계산
     tangent_norm = np.hypot(tangent_x, tangent_y)
     alignment = np.abs(
@@ -111,7 +111,7 @@ def plot_gradient_field(
     max_alignment = float(np.max(alignment))
 
     figure, axis = plt.subplots(figsize=(6.6, 6.2))
-    contour = axis.contour(x_grid, y_grid, values, levels=8, cmap="Blues")
+    contour = axis.contour(x_grid, y_grid, values, levels=8, cmap="Blues") # 등고선 그리기
     axis.clabel(contour, inline=True, fontsize=8, fmt="%.0f")
     axis.quiver(
         sample_x,
@@ -124,7 +124,7 @@ def plot_gradient_field(
         color="#d62728",
         width=0.005,
         label=r"$\nabla f=(2x,\ 2y)$",
-    )
+    ) # 화살표 그리기
     axis.set_aspect("equal", adjustable="box")
     axis.set_xlabel("x")
     axis.set_ylabel("y")

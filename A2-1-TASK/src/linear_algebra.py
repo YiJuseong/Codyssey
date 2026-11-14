@@ -72,9 +72,9 @@ def apply_transform(matrix: np.ndarray, points: np.ndarray) -> np.ndarray:
     matrix = np.asarray(matrix, dtype=float)
     points = np.asarray(points, dtype=float)
     if matrix.shape != (2, 2):
-        raise ValueError(f"변환 행렬 shape은 (2, 2)여야 한다. 받은 shape: {matrix.shape}")
+        raise ValueError(f"변환 행렬 shape은 (2, 2)여야 한다. 받은 shape: {matrix.shape}") # matrix는 변하는 방식
     if points.shape[0] != 2:
-        raise ValueError(f"점 집합 shape은 (2, N)이어야 한다. 받은 shape: {points.shape}")
+        raise ValueError(f"점 집합 shape은 (2, N)이어야 한다. 받은 shape: {points.shape}") # points는 변하는 주체의 형태
     return matrix @ points
 
 
