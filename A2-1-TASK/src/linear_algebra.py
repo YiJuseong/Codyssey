@@ -117,9 +117,9 @@ def area_ratio_vs_determinant(matrix: np.ndarray, points: np.ndarray) -> dict[st
     area_after = polygon_area(transformed)
     if area_before == 0.0:
         raise ValueError("변환 전 면적이 0이다.")
-    determinant = matrix_determinant(matrix)
+    determinant = matrix_determinant(matrix) # 이론값
     abs_determinant = abs(determinant)
-    area_ratio = area_after / area_before
+    area_ratio = area_after / area_before # 실측값
     if abs_determinant == 0.0:
         relative_error = abs(area_ratio - abs_determinant)
     else:
@@ -260,7 +260,7 @@ def power_iteration(
         if transformed_norm == 0.0:
             return 0.0, vector
         next_vector = transformed / transformed_norm
-        eigenvalue = float(next_vector @ (matrix @ next_vector))
+        eigenvalue = float(next_vector @ (matrix @ next_vector)) # 벡터의 크기가 1일때 (고유벡터x행렬)x고유벡터 = 고유값
         aligned = next_vector if np.dot(next_vector, vector) >= 0.0 else -next_vector
         if np.linalg.norm(aligned - vector) < tol:
             vector = aligned
@@ -303,17 +303,17 @@ def make_grayscale_image(size: int = 64) -> np.ndarray:
         raise ValueError("과제 조건에 맞춰 한 변은 64 이하여야 한다.")
     ys, xs = np.mgrid[0:size, 0:size]
     x_coord = xs / (size - 1)
-    y_coord = ys / (size - 1)
-    image = 0.15 + 0.25 * x_coord + 0.15 * y_coord
+    y_coord = ys / (size - 1) # 인덱스를 0~1사이 값으로 정규화
+    image = 0.15 + 0.25 * x_coord + 0.15 * y_coord # 그라데이션
     image = image + 0.20 * np.sin(2.0 * np.pi * 3.0 * x_coord) * np.cos(
-        2.0 * np.pi * 2.0 * y_coord
-    )
+        2.0 * np.pi * 2.0 * y_coord 
+    ) # 격자무늬
     circle = (x_coord - 0.35) ** 2 + (y_coord - 0.40) ** 2 <= 0.12 ** 2
-    image = np.where(circle, 0.95, image)
+    image = np.where(circle, 0.95, image) # 원 그리기
     band = np.abs(y_coord - x_coord) < 0.035
-    image = np.where(band, 0.08, image)
+    image = np.where(band, 0.08, image) # 대각선 줄
     checker = ((np.floor(xs / 2.0) + np.floor(ys / 2.0)) % 2).astype(float)
-    corner = (x_coord > 0.72) & (y_coord > 0.72)
+    corner = (x_coord > 0.72) & (y_coord > 0.72) # 바둑판 그리기
     image = np.where(corner, 0.15 + 0.75 * checker, image)
     return np.clip(image, 0.0, 1.0)
 
@@ -335,9 +335,9 @@ def svd_reconstruct(image: np.ndarray, k: int) -> np.ndarray:
         raise ValueError(f"회색조 2차원 이미지가 필요하다. 받은 ndim: {image.ndim}")
     if k < 1:
         raise ValueError("k는 1 이상이어야 한다.")
-    left, singular, right = np.linalg.svd(image, full_matrices=False)
+    left, singular, right = np.linalg.svd(image, full_matrices=False) # 각각 출력이 되는 행렬, 배율, 입력이 되는 행렬
     rank = min(k, singular.shape[0])
-    reconstructed = (left[:, :rank] * singular[:rank]) @ right[:rank, :]
+    reconstructed = (left[:, :rank] * singular[:rank]) @ right[:rank, :] # k랭크만큼의 근사 이미지를 조합
     return reconstructed
 
 
@@ -346,7 +346,7 @@ def relative_frobenius_error(original: np.ndarray, reconstructed: np.ndarray) ->
     denominator = np.linalg.norm(original)
     if denominator == 0.0:
         raise ValueError("원본 이미지의 노름이 0이다.")
-    return float(np.linalg.norm(original - reconstructed) / denominator)
+    return float(np.linalg.norm(original - reconstructed) / denominator) # 이미지의 크기 상대오차를 계산
 
 
 def plot_svd_compression(
