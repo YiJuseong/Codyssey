@@ -44,7 +44,7 @@ class VanillaGD:
         """기울기 한 번으로 매개변수를 갱신한다."""
         theta = np.asarray(theta, dtype=float)
         grad = np.asarray(grad, dtype=float)
-        return theta - self.lr * grad
+        return theta - self.lr * grad # 현재 위치 벡터 - 학습률 x 현재 위치 벡터의 기울기
 
 
 class Momentum:
@@ -76,8 +76,8 @@ class Momentum:
         grad = np.asarray(grad, dtype=float)
         if self.velocity is None or self.velocity.shape != theta.shape:
             self.velocity = np.zeros_like(theta)
-        self.velocity = self.beta * self.velocity + grad
-        return theta - self.lr * self.velocity
+        self.velocity = self.beta * self.velocity + grad # 속도 = 베타 * 이전속도 * 현재벡터의 기울기
+        return theta - self.lr * self.velocity 
 
 
 def grad_quadratic_bowl(theta: np.ndarray) -> np.ndarray:

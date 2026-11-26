@@ -30,8 +30,8 @@ def normal_pdf(x: np.ndarray, mean: float, variance: float) -> np.ndarray:
     if variance <= 0.0:
         raise ValueError("분산은 양수여야 한다.")
     values = np.asarray(x, dtype=float)
-    scale = np.sqrt(variance)
-    coefficient = 1.0 / np.sqrt(2.0 * np.pi * variance)
+    scale = np.sqrt(variance) # 표준편차
+    coefficient = 1.0 / np.sqrt(2.0 * np.pi * variance) # np.exp(-0.5 * ((values - mean) / scale) ** 2) 곡선 아래 넓이를 1로 만드는 계수 
     return coefficient * np.exp(-0.5 * ((values - mean) / scale) ** 2)
 
 
